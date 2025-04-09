@@ -1,11 +1,18 @@
 import asyncio
 import json
+import os
 from pydantic import SecretStr
+from dotenv import load_dotenv 
 from langchain_openai import ChatOpenAI
 from browser_use import Agent
 
+
+load_dotenv()
+
 # Replace with your actual working OpenAI key
-api_key = SecretStr("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")
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("❌ OPENAI_API_KEY not found in environment variables.")
 
 # Load task
 with open("data/tasks/my-task.json", "r") as f:
@@ -16,7 +23,7 @@ instruction = task_data["instructions"]
 llm = ChatOpenAI(
     model="gpt-4o-mini",  # or gpt-3.5-turbo
     temperature=0.0,
-    api_key=api_key
+    api_key=SecretStr(api_key)
 )
 
 agent = Agent(task=instruction, llm=llm)
